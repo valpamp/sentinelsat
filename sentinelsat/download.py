@@ -167,6 +167,8 @@ class Downloader:
             if stop_event and stop_event.is_set():
                 raise concurrent.futures.CancelledError()
             node_path = node_info["node_path"]
+            if 'PHOEBUS' in node_path:             
+                node_path = './' +  node_path[node_path.find('/GRANULE'):] # takes care of extra path components
             path = (product_path / node_path).resolve()
             node_info["path"] = path
             node_info["downloaded_bytes"] = 0
@@ -215,6 +217,8 @@ class Downloader:
         if not skip_download:
             # Store the number of downloaded bytes for unit tests
             temp_path.parent.mkdir(parents=True, exist_ok=True)
+            if 'PHOEBUS' in product_info["url"]: # takes care of extra path components
+                product_info["url"] = product_info["url"][0:product_info["url"].find("Nodes('')")] + product_info["url"][product_info["url"].find("Nodes('GRANULE')"):]
             product_info["downloaded_bytes"] = self._download(
                 product_info["url"],
                 temp_path,
